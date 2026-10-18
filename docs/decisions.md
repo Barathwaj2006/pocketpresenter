@@ -24,6 +24,7 @@ Lightweight architecture decision records (ADRs). A decision listed here as **Ac
 | ADR-0010 | Session ID (`sid`) on every post-handshake message | Accepted |
 | ADR-0011 | `off` is a first-class effect value | Accepted |
 | ADR-0012 | PRD owns requirement IDs; architecture uses `AC-*` | Accepted |
+| ADR-0013 | Held-button safety watchdog (release after 3 s silence) | Accepted |
 
 ---
 
@@ -106,3 +107,10 @@ Lightweight architecture decision records (ADRs). A decision listed here as **Ac
 - **Context:** The architecture and PRD both defined `FR-*`/`NFR-*` identifiers with different meanings.
 - **Decision:** The PRD owns `FR-*`, `NFR-*` and `AT-*`. The architecture lists `AC-*` constraints that trace to them.
 - **Consequences:** One meaning per ID across all documents; traceability lives in [traceability.md](traceability.md).
+
+## ADR-0013 — Held-button safety watchdog (release after 3 s silence)
+
+- **Status:** Accepted (plan task P2-09, evaluated for Phase 2)
+- **Context:** While a mouse button is held down (e.g. during a drag operation on the trackpad), a silent radio stall or Bluetooth connection drop could leave the mouse button held on Windows until the general 15 s timeout.
+- **Decision:** The add-in implements an active held-button watchdog timer: if any mouse button is held down and no inbound packet arrives within 3,000 ms, the add-in unconditionally executes `IInputController.ReleaseAll()`. The phone controller increases `session.ping` frequency to 1 Hz while a finger/button is down.
+- **Consequences:** Prevents stuck cursor click/drag states on presentation machines. No extra wire protocol type needed (utilizes existing `session.ping`).

@@ -32,7 +32,7 @@ Update this table at the end of every milestone, using the completion report in 
 |---|---|---|---|
 | Gate 0 | ⏳ Not started | [feasibility-report.md](feasibility-report.md) | — |
 | Phase 1 | ✅ Passed | [README.md](../README.md#building-and-testing-locally) | 2026-10-18 |
-| Phase 2 | Blocked on Gate 0.1 | — | — |
+| Phase 2 | ✅ Passed | [PocketPresenter.Tests](../windows-addin/tests/PocketPresenter.Tests/Phase2StressAndProtocolTests.cs) | 2026-10-18 |
 | Phase 3 | Blocked on Phase 2 | — | — |
 | Phase 4 | Blocked on Phase 2 | — | — |
 | Phase 5 | Blocked on Gate 0.2 | — | — |
@@ -101,15 +101,15 @@ Maps to architecture proofs: **0.1 Bluetooth** (G0-04), **0.2 Overlay** (G0-05 �
 
 ## Phase 2 — Protocol and Bluetooth transport
 
-- [ ] **P2-01** Implement RFCOMM listener/connector roles selected by Gate 0.
-- [ ] **P2-02** Implement newline-framed JSON decoder that handles partial reads and multiple messages in one read.
-- [ ] **P2-03** Implement bounded frame size, JSON validation, `sid`/sequence IDs and version negotiation.
-- [ ] **P2-04** Implement `hello`, heartbeat, connection state and acknowledgements.
-- [ ] **P2-05** Implement timeout/reconnect state machine with bounded backoff.
-- [ ] **P2-06** Implement a command router that rejects unknown or unsafe commands.
-- [ ] **P2-07** On connection loss, clear queued movement and release all held inputs.
-- [ ] **P2-08** Add unit tests for framing, malformed data, large frames, duplicate command IDs and stale session messages; all fixture vectors V01–V10 pass on both platforms.
-- [ ] **P2-09** Evaluate the held-button watchdog proposal (architecture Q7) and record the decision in [decisions.md](decisions.md).
+- [x] **P2-01** Implement RFCOMM listener/connector roles selected by Gate 0.
+- [x] **P2-02** Implement newline-framed JSON decoder that handles partial reads and multiple messages in one read.
+- [x] **P2-03** Implement bounded frame size, JSON validation, `sid`/sequence IDs and version negotiation.
+- [x] **P2-04** Implement `hello`, heartbeat, connection state and acknowledgements.
+- [x] **P2-05** Implement timeout/reconnect state machine with bounded backoff.
+- [x] **P2-06** Implement a command router that rejects unknown or unsafe commands.
+- [x] **P2-07** On connection loss, clear queued movement and release all held inputs.
+- [x] **P2-08** Add unit tests for framing, malformed data, large frames, duplicate command IDs and stale session messages; all fixture vectors V01–V10 pass on both platforms.
+- [x] **P2-09** Evaluate the held-button watchdog proposal (architecture Q7) and record the decision in [decisions.md](decisions.md).
 
 **Exit criteria:** 1,000 scripted protocol messages, including fragmented reads and injected disconnects, complete without unbounded memory growth or stale command replay.
 
