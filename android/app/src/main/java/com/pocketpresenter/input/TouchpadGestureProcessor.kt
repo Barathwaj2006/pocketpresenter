@@ -128,7 +128,7 @@ class TouchpadGestureProcessor(
 
                         if (abs(dy) >= 2.0f) {
                             twoFingerMoved = true
-                            val scrollDelta = if (reverseScroll) -dy else dy
+                            val scrollDelta = (if (reverseScroll) -dy else dy) / 10.0f
                             // Normal mouse wheel increment
                             inputController.sendScroll(scrollDelta.roundToInt())
                             lastTwoFingerY = currentAvgY

@@ -162,16 +162,16 @@ Maps to architecture proofs: **0.1 Bluetooth** (G0-04), **0.2 Overlay** (G0-05 �
 
 ## Phase 7 — Android controller UI and session integration
 
-- [ ] **P7-01** Build setup/permission screen.
-- [ ] **P7-02** Build Home/Connection state screen.
-- [ ] **P7-03** Build Touchpad and Slides modes.
-- [ ] **P7-04** Build effect picker (including Off) and basic settings.
-- [ ] **P7-05** Integrate RFCOMM connection status with UI using the state-to-controls table ([app_flow.md §3](app_flow.md#3-state-driven-controls)).
-- [ ] **P7-06** Add a user-started foreground session using the correct Android configuration.
-- [ ] **P7-07** Implement screen-off volume handling behind a tested capability/status flag (depends on Gate 0.3).
-- [ ] **P7-08** Build Pocket Mode activation and user-facing limitation messaging (validated / not validated / unsupported).
-- [ ] **P7-09** Implement every row of the [error and recovery catalog](app_flow.md#4-error-and-recovery-catalog).
-- [ ] **P7-10** Test screen rotation, process recreation and reconnect.
+- [x] **P7-01** Build setup/permission screen.
+- [x] **P7-02** Build Home/Connection state screen.
+- [x] **P7-03** Build Touchpad and Slides modes.
+- [x] **P7-04** Build effect picker (including Off) and basic settings.
+- [x] **P7-05** Integrate RFCOMM connection status with UI using the state-to-controls table ([app_flow.md §3](app_flow.md#3-state-driven-controls)).
+- [x] **P7-06** Add a user-started foreground session using the correct Android configuration.
+- [x] **P7-07** Implement screen-off volume handling behind a tested capability/status flag (depends on Gate 0.3).
+- [x] **P7-08** Build Pocket Mode activation and user-facing limitation messaging (validated / not validated / unsupported).
+- [x] **P7-09** Implement every row of the [error and recovery catalog](app_flow.md#4-error-and-recovery-catalog).
+- [x] **P7-10** Test screen rotation, process recreation and reconnect.
 
 **Exit criteria:** the phone UI reflects actual transport state and does not pretend to be connected when it is not.
 
