@@ -25,6 +25,7 @@ namespace PocketPresenter.Protocol
         public string? SessionId { get; set; }
         public int LastSequenceReceived { get; set; } = -1;
         private readonly HashSet<int> _executedSequences = new HashSet<int>();
+        private int _nextOutboundSeq;
 
         public void Reset(string? newSessionId = null)
         {
@@ -32,10 +33,12 @@ namespace PocketPresenter.Protocol
             SessionId = newSessionId;
             LastSequenceReceived = -1;
             _executedSequences.Clear();
+            _nextOutboundSeq = 0;
         }
 
         public bool HasExecutedSequence(int seq) => _executedSequences.Contains(seq);
         public void MarkSequenceExecuted(int seq) => _executedSequences.Add(seq);
+        public int NextOutboundSequence() => _nextOutboundSeq++;
     }
 
     public static class ProtocolValidator

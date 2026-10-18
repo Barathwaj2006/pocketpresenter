@@ -1,31 +1,26 @@
 using System;
-using PocketPresenter.Core.Diagnostics;
 using PocketPresenter.Core.PowerPoint;
 
 namespace PocketPresenter.AddIn
 {
     /// <summary>
-    /// VSTO Add-in entrypoint scaffold.
-    /// Office Interop calls must ONLY occur on PowerPoint's STA/UI thread.
+    /// VSTO Add-in lifecycle controller and entrypoint wrapper.
+    /// Strictly routes Office COM interactions to PowerPoint's STA/UI thread.
+    /// Unsubscribes all event handlers and disposes controllers on shutdown.
     /// </summary>
-    public class ThisAddIn : IDisposable
+    public class ThisAddIn : PresentationSessionCoordinator
     {
-        private bool _isInitialized;
+        private bool _isStarted;
 
         public void InternalStartup()
         {
-            if (_isInitialized) return;
-            _isInitialized = true;
+            if (_isStarted) return;
+            _isStarted = true;
         }
 
         public void InternalShutdown()
         {
             Dispose();
-        }
-
-        public void Dispose()
-        {
-            _isInitialized = false;
         }
     }
 }

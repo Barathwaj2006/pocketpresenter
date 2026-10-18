@@ -56,3 +56,33 @@ Fill from the sections above. Publish this table in the README when a release is
 | Windows | PowerPoint | Android phone (model / version) | Screen-off volume | Status |
 |---|---|---|---|---|
 | — | — | — | — | No configuration validated yet |
+
+## 4. Phase 3 — PowerPoint Command Verification Procedure (P3-05)
+
+### Test 3.1: Repeated Slide Commands (AT-01)
+1. Open a test deck with ≥ 20 slides in PowerPoint and start Slide Show (F5).
+2. Connect PocketPresenter via Bluetooth and verify ribbon indicates `Phone: Presenting Active`.
+3. Send 50 rapid `slide.next` commands from the controller.
+4. Verify slide count advances strictly 1-by-1 without skipping or lost commands.
+5. Send 50 rapid `slide.previous` commands.
+6. Verify slide count decrements accurately back to Slide 1.
+
+### Test 3.2: First / Last Slide Boundary Handling
+1. Navigate to Slide 1 and send 5 consecutive `slide.previous` commands.
+2. Verify slide stays on Slide 1; no black screen, no loop, no exception thrown.
+3. Navigate to final slide (e.g., Slide 20) and send 5 consecutive `slide.next` commands.
+4. Verify slide stays on final slide without exiting slide show into editing mode.
+
+### Test 3.3: Focus Independence (No Keystroke Bleed)
+1. Launch Notepad and place it in the foreground with keyboard focus while PowerPoint Slide Show runs in fullscreen/background.
+2. Send `slide.next` from the phone.
+3. Verify the slide show advances.
+4. Verify NO characters, spaces, or PageDown keystrokes are typed into Notepad.
+5. Exit Slide Show mode. Send `slide.next` while Notepad has focus.
+6. Verify `NO_ACTIVE_SLIDESHOW` error envelope is returned; Notepad remains completely untouched.
+
+### Test 3.4: Clean Add-in Unload & Event Cleanup (P3-06)
+1. With slide show running, close PowerPoint or disable add-in via COM Add-ins dialog.
+2. Confirm add-in unloads without crash dialog or COM orphan process hanging in Task Manager.
+3. Confirm all event delegates are cleanly detached and transport closes gracefully.
+

@@ -115,12 +115,12 @@ Maps to architecture proofs: **0.1 Bluetooth** (G0-04), **0.2 Overlay** (G0-05 â
 
 ## Phase 3 â€” PowerPoint command control
 
-- [ ] **P3-01** Add connect/disconnect and status to the PowerPoint ribbon.
-- [ ] **P3-02** Detect slide-show start, current view/window and slide-show end.
-- [ ] **P3-03** Implement next/previous via PowerPoint Object Model on the PowerPoint STA/UI thread.
-- [ ] **P3-04** Implement command acknowledgements and explicit errors when no eligible slide show is active.
-- [ ] **P3-05** Add a manual Windows test for repeated commands, last-slide behavior and focus changes.
-- [ ] **P3-06** Confirm the add-in unloads cleanly and removes all event subscriptions.
+- [x] **P3-01** Add connect/disconnect and status to the PowerPoint ribbon.
+- [x] **P3-02** Detect slide-show start, current view/window and slide-show end.
+- [x] **P3-03** Implement next/previous via PowerPoint Object Model on the PowerPoint STA/UI thread.
+- [x] **P3-04** Implement command acknowledgements and explicit errors when no eligible slide show is active.
+- [x] **P3-05** Add a manual Windows test for repeated commands, last-slide behavior and focus changes.
+- [x] **P3-06** Confirm the add-in unloads cleanly and removes all event subscriptions.
 
 **Exit criteria:** no duplicate or lost slide commands in the acceptance run under stable Bluetooth (AT-01); commands are not sent to unrelated applications.
 

@@ -3,10 +3,27 @@ using System.Text.Json;
 
 namespace PocketPresenter.Protocol
 {
+    public readonly struct CommandExecutionResult
+    {
+        public bool Success { get; }
+        public string? ErrorCode { get; }
+        public string? ErrorMessage { get; }
+
+        public static CommandExecutionResult Ok() => new CommandExecutionResult(true, null, null);
+        public static CommandExecutionResult Fail(string code, string message) => new CommandExecutionResult(false, code, message);
+
+        private CommandExecutionResult(bool success, string? code, string? message)
+        {
+            Success = success;
+            ErrorCode = code;
+            ErrorMessage = message;
+        }
+    }
+
     public interface ICommandHandler
     {
-        void HandleSlideNext(int seq);
-        void HandleSlidePrevious(int seq);
+        CommandExecutionResult HandleSlideNext(int seq);
+        CommandExecutionResult HandleSlidePrevious(int seq);
         void HandlePointerDelta(int dx, int dy);
         void HandlePointerButton(string button, string action);
         void HandlePointerScroll(int dy);
@@ -41,7 +58,7 @@ namespace PocketPresenter.Protocol
                 if (envelope.Type == MessageTypes.SlideNext || envelope.Type == MessageTypes.SlidePrevious ||
                     envelope.Type == MessageTypes.EffectSet || envelope.Type == MessageTypes.DrawStart)
                 {
-                    SendError(envelope.Sequence, valResult.ErrorCode ?? ErrorCodes.Internal, valResult.ErrorMessage ?? "Error");
+                    SendError(envelope.Sequence, valResult.ErrorCode ?? ErrorCodes.Internal, valResult.ErrorMessage ?? "Error", session);
                 }
                 return valResult;
             }
@@ -51,13 +68,27 @@ namespace PocketPresenter.Protocol
             switch (envelope.Type)
             {
                 case MessageTypes.SlideNext:
-                    _handler.HandleSlideNext(envelope.Sequence);
-                    SendAck(envelope.Sequence);
+                    var nextResult = _handler.HandleSlideNext(envelope.Sequence);
+                    if (nextResult.Success)
+                    {
+                        SendAck(envelope.Sequence, session);
+                    }
+                    else
+                    {
+                        SendError(envelope.Sequence, nextResult.ErrorCode ?? ErrorCodes.Internal, nextResult.ErrorMessage ?? "Next failed", session);
+                    }
                     break;
 
                 case MessageTypes.SlidePrevious:
-                    _handler.HandleSlidePrevious(envelope.Sequence);
-                    SendAck(envelope.Sequence);
+                    var prevResult = _handler.HandleSlidePrevious(envelope.Sequence);
+                    if (prevResult.Success)
+                    {
+                        SendAck(envelope.Sequence, session);
+                    }
+                    else
+                    {
+                        SendError(envelope.Sequence, prevResult.ErrorCode ?? ErrorCodes.Internal, prevResult.ErrorMessage ?? "Previous failed", session);
+                    }
                     break;
 
                 case MessageTypes.PointerDelta:
@@ -83,7 +114,7 @@ namespace PocketPresenter.Protocol
                     double scale = envelope.Payload.TryGetProperty("scale", out var scp) ? scp.GetDouble() : 1.0;
                     bool rm = envelope.Payload.TryGetProperty("reducedMotion", out var rmp) && rmp.GetBoolean();
                     _handler.HandleEffectSet(eff, intensity, scale, rm);
-                    SendAck(envelope.Sequence);
+                    SendAck(envelope.Sequence, session);
                     break;
 
                 case MessageTypes.DrawStart:
@@ -92,7 +123,7 @@ namespace PocketPresenter.Protocol
                     string color = envelope.Payload.TryGetProperty("color", out var cp) ? cp.GetString() ?? "#FF0000" : "#FF0000";
                     int width = envelope.Payload.TryGetProperty("width", out var wp) ? wp.GetInt32() : 3;
                     _handler.HandleDrawStart(x, y, color, width);
-                    SendAck(envelope.Sequence);
+                    SendAck(envelope.Sequence, session);
                     break;
 
                 case MessageTypes.DrawPoint:
@@ -104,7 +135,7 @@ namespace PocketPresenter.Protocol
 
                 case MessageTypes.DrawEnd:
                     _handler.HandleDrawEnd();
-                    SendAck(envelope.Sequence);
+                    SendAck(envelope.Sequence, session);
                     break;
 
                 case MessageTypes.StateRequest:
@@ -114,43 +145,48 @@ namespace PocketPresenter.Protocol
                 case MessageTypes.SessionPing:
                     // Respond with session.pong echoing timestamp t
                     long t = envelope.Payload.TryGetProperty("t", out var tp) ? tp.GetInt64() : 0;
-                    SendPong(session.SessionId, t);
+                    SendPong(session.SessionId, t, session);
                     break;
             }
 
             return ValidationResult.Success();
         }
 
-        private void SendAck(int seq)
+        private void SendAck(int seq, ProtocolSession? session = null)
         {
             var payload = JsonDocument.Parse($"{{\"ref\":{seq},\"ok\":true}}").RootElement;
             SendReplyRequested?.Invoke(new Envelope
             {
+                Version = 1,
+                SessionId = session?.SessionId,
+                Sequence = session?.NextOutboundSequence() ?? 0,
                 Type = MessageTypes.CommandAck,
-                Sequence = 0,
                 Payload = payload
             });
         }
 
-        private void SendError(int seq, string code, string message)
+        private void SendError(int seq, string code, string message, ProtocolSession? session = null)
         {
             var payload = JsonDocument.Parse($"{{\"ref\":{seq},\"code\":\"{code}\",\"message\":\"{message}\"}}").RootElement;
             SendReplyRequested?.Invoke(new Envelope
             {
+                Version = 1,
+                SessionId = session?.SessionId,
+                Sequence = session?.NextOutboundSequence() ?? 0,
                 Type = MessageTypes.CommandError,
-                Sequence = 0,
                 Payload = payload
             });
         }
 
-        private void SendPong(string? sid, long timestamp)
+        private void SendPong(string? sid, long timestamp, ProtocolSession? session = null)
         {
             var payload = JsonDocument.Parse($"{{\"t\":{timestamp}}}").RootElement;
             SendReplyRequested?.Invoke(new Envelope
             {
-                Type = MessageTypes.SessionPong,
+                Version = 1,
                 SessionId = sid,
-                Sequence = 0,
+                Sequence = session?.NextOutboundSequence() ?? 0,
+                Type = MessageTypes.SessionPong,
                 Payload = payload
             });
         }

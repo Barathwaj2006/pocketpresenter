@@ -18,8 +18,17 @@ namespace PocketPresenter.Tests
         public string? LastAction { get; private set; }
         public string? LastEffect { get; private set; }
 
-        public void HandleSlideNext(int seq) => NextCount++;
-        public void HandleSlidePrevious(int seq) => PreviousCount++;
+        public CommandExecutionResult HandleSlideNext(int seq)
+        {
+            NextCount++;
+            return CommandExecutionResult.Ok();
+        }
+
+        public CommandExecutionResult HandleSlidePrevious(int seq)
+        {
+            PreviousCount++;
+            return CommandExecutionResult.Ok();
+        }
         public void HandlePointerDelta(int dx, int dy)
         {
             PointerDeltaCount++;
