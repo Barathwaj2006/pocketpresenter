@@ -1,0 +1,55 @@
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors / IDEs
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+*.user
+*.suo
+.vs/
+
+# Android / Gradle
+*.iml
+.gradle/
+local.properties
+/android/**/build/
+/android/.idea/
+/android/captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aab
+*.keystore
+*.jks
+
+# .NET / VSTO
+[Bb]in/
+[Oo]bj/
+*.pfx
+*.snk
+*.pdb
+*.vsto
+*.application
+packages/
+TestResults/
+*.log
+
+# Secrets
+.env
+.env.*
+secrets.*
+
+# Local diagnostics and captures
+diagnostics/
+*.etl
+
+# Accidental Node / Expo / Web caches
+node_modules/
+.npm/
+.yarn/
+.expo/
+*.tsbuildinfo

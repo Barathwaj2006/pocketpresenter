@@ -1,0 +1,92 @@
+{
+  "protocolVersion": 1,
+  "description": "Shared protocol test vectors. Kotlin and C# test suites must both consume this file. Keep in sync with docs/protocol.md section 9.",
+  "session": { "sid": "3f2b8c1e-5d7a-4c0e-9b1d-2a6f4e8c7d10", "staleSid": "00000000-0000-4000-8000-000000000000" },
+  "vectors": [
+    {
+      "id": "V01",
+      "description": "Valid slide.next before handshake is rejected",
+      "handshakeComplete": false,
+      "reads": ["{\"v\":1,\"seq\":1,\"type\":\"slide.next\",\"payload\":{}}\n"],
+      "expect": [{ "result": "error", "code": "NOT_READY" }]
+    },
+    {
+      "id": "V02",
+      "description": "Two complete frames in one read are both processed in order",
+      "handshakeComplete": true,
+      "reads": [
+        "{\"v\":1,\"sid\":\"3f2b8c1e-5d7a-4c0e-9b1d-2a6f4e8c7d10\",\"seq\":1,\"type\":\"pointer.delta\",\"payload\":{\"dx\":1,\"dy\":0}}\n{\"v\":1,\"sid\":\"3f2b8c1e-5d7a-4c0e-9b1d-2a6f4e8c7d10\",\"seq\":2,\"type\":\"pointer.delta\",\"payload\":{\"dx\":2,\"dy\":0}}\n"
+      ],
+      "expect": [
+        { "result": "ok", "type": "pointer.delta", "seq": 1 },
+        { "result": "ok", "type": "pointer.delta", "seq": 2 }
+      ]
+    },
+    {
+      "id": "V03",
+      "description": "One frame split across three reads is processed once, after the newline",
+      "handshakeComplete": true,
+      "reads": [
+        "{\"v\":1,\"sid\":\"3f2b8c1e-5d7a-4c0e-9b1d-2a6f4e8c7d10\",",
+        "\"seq\":1,\"type\":\"slide.next\",",
+        "\"payload\":{}}\n"
+      ],
+      "expect": [{ "result": "ok", "type": "slide.next", "seq": 1 }]
+    },
+    {
+      "id": "V04",
+      "description": "Unknown message type is rejected",
+      "handshakeComplete": true,
+      "reads": ["{\"v\":1,\"sid\":\"3f2b8c1e-5d7a-4c0e-9b1d-2a6f4e8c7d10\",\"seq\":2,\"type\":\"run.shell\",\"payload\":{\"cmd\":\"x\"}}\n"],
+      "expect": [{ "result": "error", "code": "BAD_TYPE" }]
+    },
+    {
+      "id": "V05",
+      "description": "Out-of-range pointer.delta is rejected",
+      "handshakeComplete": true,
+      "reads": ["{\"v\":1,\"sid\":\"3f2b8c1e-5d7a-4c0e-9b1d-2a6f4e8c7d10\",\"seq\":3,\"type\":\"pointer.delta\",\"payload\":{\"dx\":99999,\"dy\":0}}\n"],
+      "expect": [{ "result": "error", "code": "BAD_FIELD" }]
+    },
+    {
+      "id": "V06",
+      "description": "slide.next repeated with the same seq executes once; the duplicate is reported",
+      "handshakeComplete": true,
+      "reads": [
+        "{\"v\":1,\"sid\":\"3f2b8c1e-5d7a-4c0e-9b1d-2a6f4e8c7d10\",\"seq\":10,\"type\":\"slide.next\",\"payload\":{}}\n",
+        "{\"v\":1,\"sid\":\"3f2b8c1e-5d7a-4c0e-9b1d-2a6f4e8c7d10\",\"seq\":10,\"type\":\"slide.next\",\"payload\":{}}\n"
+      ],
+      "expect": [
+        { "result": "ok", "type": "slide.next", "seq": 10, "executions": 1 },
+        { "result": "error", "code": "DUPLICATE", "executions": 0 }
+      ]
+    },
+    {
+      "id": "V07",
+      "description": "A 5000-byte frame is rejected and the connection is closed",
+      "handshakeComplete": true,
+      "generate": { "baseType": "slide.next", "padToBytes": 5000 },
+      "expect": [{ "result": "error", "code": "BAD_FRAME", "closeConnection": true }]
+    },
+    {
+      "id": "V08",
+      "description": "A message carrying a sid from a previous session is rejected and nothing executes",
+      "handshakeComplete": true,
+      "reads": ["{\"v\":1,\"sid\":\"00000000-0000-4000-8000-000000000000\",\"seq\":1,\"type\":\"slide.next\",\"payload\":{}}\n"],
+      "expect": [{ "result": "error", "code": "BAD_SESSION", "executions": 0 }]
+    },
+    {
+      "id": "V09",
+      "description": "effect.set with effect off is accepted",
+      "handshakeComplete": true,
+      "reads": ["{\"v\":1,\"sid\":\"3f2b8c1e-5d7a-4c0e-9b1d-2a6f4e8c7d10\",\"seq\":4,\"type\":\"effect.set\",\"payload\":{\"effect\":\"off\",\"intensity\":0.35,\"scale\":1.0,\"reducedMotion\":false}}\n"],
+      "expect": [{ "result": "ok", "type": "effect.set", "seq": 4 }]
+    },
+    {
+      "id": "V10",
+      "description": "effect.set with an unknown effect is rejected",
+      "handshakeComplete": true,
+      "reads": ["{\"v\":1,\"sid\":\"3f2b8c1e-5d7a-4c0e-9b1d-2a6f4e8c7d10\",\"seq\":5,\"type\":\"effect.set\",\"payload\":{\"effect\":\"sparkle\",\"intensity\":0.35,\"scale\":1.0,\"reducedMotion\":false}}\n"],
+      "expect": [{ "result": "error", "code": "BAD_FIELD" }]
+    }
+  ]
+}
