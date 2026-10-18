@@ -138,12 +138,12 @@ Maps to architecture proofs: **0.1 Bluetooth** (G0-04), **0.2 Overlay** (G0-05 â
 
 ## Phase 5 â€” Overlay lifecycle and baseline cursor
 
-- [ ] **P5-01** Implement the add-in-owned transparent overlay window.
-- [ ] **P5-02** Verify click-through, non-activation and target-window positioning.
-- [ ] **P5-03** Display a simple cursor-following dot/ring with a single color and intensity.
-- [ ] **P5-04** Link overlay visibility to authenticated connection and active slide-show lifecycle.
-- [ ] **P5-05** Hide and clean up on disconnect, slide-show exit, PowerPoint shutdown and rendering errors.
-- [ ] **P5-06** Test laptop-only display, projector/extended display, Presenter View, DPI scaling and transitions.
+- [x] **P5-01** Implement the add-in-owned transparent overlay window.
+- [x] **P5-02** Verify click-through, non-activation and target-window positioning.
+- [x] **P5-03** Display a simple cursor-following dot/ring with a single color and intensity.
+- [x] **P5-04** Link overlay visibility to authenticated connection and active slide-show lifecycle.
+- [x] **P5-05** Hide and clean up on disconnect, slide-show exit, PowerPoint shutdown and rendering errors.
+- [x] **P5-06** Test laptop-only display, projector/extended display, Presenter View, DPI scaling and transitions.
 
 **Exit criteria:** baseline overlay is consistently aligned, never blocks clicks, never steals focus and never remains visible after the session ends (AT-04, AT-05).
 

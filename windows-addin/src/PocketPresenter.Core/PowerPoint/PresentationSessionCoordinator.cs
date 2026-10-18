@@ -1,13 +1,14 @@
 using System;
 using System.Text.Json;
 using PocketPresenter.Core.Input;
+using PocketPresenter.Core.Overlay;
 using PocketPresenter.Protocol;
 
 namespace PocketPresenter.Core.PowerPoint
 {
     /// <summary>
     /// Coordinates PowerPoint presentation control, session state machine,
-    /// ribbon UI state, pointer input controller, and outbound protocol messaging.
+    /// ribbon UI state, pointer input controller, overlay window, and outbound protocol messaging.
     /// Strictly adheres to STA thread rules and unsubscribes all events on unload.
     /// </summary>
     public class PresentationSessionCoordinator : IDisposable, ICommandHandler
@@ -17,6 +18,7 @@ namespace PocketPresenter.Core.PowerPoint
         public CommandRouter CommandRouter { get; }
         public RibbonController RibbonController { get; }
         public PointerController InputController { get; }
+        public OverlayWindowController OverlayController { get; }
 
         public event Action<Envelope>? OutboundMessageReady;
 
@@ -37,13 +39,15 @@ namespace PocketPresenter.Core.PowerPoint
             PowerPointInteropController? powerPointController = null,
             SessionStateMachine? sessionStateMachine = null,
             RibbonController? ribbonController = null,
-            PointerController? inputController = null)
+            PointerController? inputController = null,
+            OverlayWindowController? overlayController = null)
         {
             PowerPointController = powerPointController ?? new PowerPointInteropController();
             SessionStateMachine = sessionStateMachine ?? new SessionStateMachine();
             CommandRouter = new CommandRouter(this);
             RibbonController = ribbonController ?? new RibbonController();
             InputController = inputController ?? new PointerController();
+            OverlayController = overlayController ?? new OverlayWindowController();
 
             _onConnectRequested = () => SessionStateMachine.StartConnecting();
             _onDisconnectRequested = () => SessionStateMachine.Disconnect();
@@ -61,6 +65,7 @@ namespace PocketPresenter.Core.PowerPoint
             _onSlideShowEnded = () =>
             {
                 SessionStateMachine.ArmPresentation(false);
+                OverlayController.Hide();
                 BroadcastStateUpdate();
             };
 
@@ -93,23 +98,35 @@ namespace PocketPresenter.Core.PowerPoint
             {
                 case SessionState.Disconnected:
                     RibbonController.UpdateStatus(RibbonConnectionStatus.Disconnected);
+                    OverlayController.Hide();
                     break;
+
                 case SessionState.Connecting:
                     RibbonController.UpdateStatus(RibbonConnectionStatus.Connecting);
+                    OverlayController.Hide();
                     break;
+
                 case SessionState.ConnectedIdle:
                     RibbonController.UpdateStatus(RibbonConnectionStatus.Connected);
+                    OverlayController.Hide();
                     break;
+
                 case SessionState.PresentingArmed:
                     RibbonController.UpdateStatus(RibbonConnectionStatus.Presenting);
+                    if (!RibbonController.ActiveEffect.Equals("off", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var (curX, curY) = InputController.GetCursorPosition();
+                        OverlayController.Show(curX, curY, 1920, 1080);
+                    }
                     break;
             }
         }
 
         private void OnSessionDisconnectCleanup()
         {
-            // Mandatory input safety cleanup: release all held buttons
+            // Mandatory input and overlay safety cleanup
             InputController.ReleaseAll();
+            OverlayController.Hide();
         }
 
         public void BroadcastStateUpdate()
@@ -160,6 +177,8 @@ namespace PocketPresenter.Core.PowerPoint
         public void HandlePointerDelta(int dx, int dy)
         {
             InputController.MoveBy(dx, dy);
+            var (curX, curY) = InputController.GetCursorPosition();
+            OverlayController.UpdateCursorPosition(curX, curY);
         }
 
         public void HandlePointerButton(string button, string action)
@@ -189,6 +208,19 @@ namespace PocketPresenter.Core.PowerPoint
         public void HandleEffectSet(string effect, double intensity, double scale, bool reducedMotion)
         {
             RibbonController.OnEffectSelected(effect);
+            OverlayController.Intensity = intensity;
+            OverlayController.Scale = scale;
+            OverlayController.ReducedMotion = reducedMotion;
+
+            if (effect.Equals("off", StringComparison.OrdinalIgnoreCase))
+            {
+                OverlayController.Hide();
+            }
+            else if (SessionStateMachine.State == SessionState.PresentingArmed)
+            {
+                var (curX, curY) = InputController.GetCursorPosition();
+                OverlayController.Show(curX, curY, 1920, 1080);
+            }
         }
 
         public void HandleDrawStart(double x, double y, string color, int width) { }
@@ -222,6 +254,9 @@ namespace PocketPresenter.Core.PowerPoint
 
             InputController.ReleaseAll();
             InputController.Dispose();
+
+            OverlayController.Hide();
+            OverlayController.Dispose();
         }
     }
 }

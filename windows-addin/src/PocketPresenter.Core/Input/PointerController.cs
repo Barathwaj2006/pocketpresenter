@@ -125,6 +125,14 @@ namespace PocketPresenter.Core.Input
             }
         }
 
+        public (int X, int Y) GetCursorPosition()
+        {
+            lock (_lock)
+            {
+                return _nativeService.GetCursorPosition();
+            }
+        }
+
         public void ButtonDown(MouseButton button)
         {
             lock (_lock)

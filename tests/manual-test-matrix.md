@@ -124,4 +124,28 @@ Fill from the sections above. Publish this table in the README when a release is
   - Median latency target: $< 50\text{ ms}$.
   - p95 latency target: $< 100\text{ ms}$.
 
+## 6. Phase 5 — Overlay Lifecycle & Baseline Cursor Verification (P5-06, AT-04, AT-05)
+
+### Test 5.1: Click-Through & Non-Activation (AT-04)
+1. In active Slide Show, position the baseline cursor ring over an interactive hyperlink or slide navigation button.
+2. Click the touchpad (single-finger tap or physical mouse click).
+3. Verify the underlying link/button triggers immediately; the overlay window does NOT steal focus, intercept the click, or flash a title bar.
+
+### Test 5.2: Display Configurations (Laptop, Projector, Presenter View)
+1. **Laptop-only:** Verify overlay ring aligns with native Windows cursor across full screen.
+2. **Extended / Projector Display:** Drag slide show to secondary display; verify overlay renders on the target presentation screen.
+3. **Presenter View:** Verify overlay displays on the public audience slide show, NOT on the private speaker notes window.
+
+### Test 5.3: Display Scaling & Transitions (DPI 100%, 150%, 200%)
+1. Change Windows display scaling to 150% and 200%.
+2. Verify overlay dot/ring tracks cursor position without offset or visual clipping.
+3. Trigger slide transitions (e.g. Fade, Push) and embedded video playback; verify overlay does not flicker or break video acceleration.
+
+### Test 5.4: Automatic Teardown & Leak Prevention (AT-05)
+1. End slide show (Esc) while phone remains connected.
+2. Verify overlay window disappears immediately; no residual ring or ghost artifact remains on desktop.
+3. Re-enter slide show (F5): verify overlay reappears automatically.
+4. With slide show running, disconnect Bluetooth or close PowerPoint; verify overlay is destroyed cleanly with zero orphan processes.
+
+
 
