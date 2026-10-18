@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  windows-dotnet:
+    name: Build & Test Windows .NET
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore windows-addin/PocketPresenter.sln
+
+      - name: Build solution
+        run: dotnet build windows-addin/PocketPresenter.sln --no-restore --configuration Release
+
+      - name: Run unit & vector tests
+        run: dotnet test windows-addin/tests/PocketPresenter.Tests/PocketPresenter.Tests.csproj --no-build --configuration Release --verbosity normal
+
+  android-build:
+    name: Build & Test Android
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x android/gradlew
+        working-directory: .
+
+      - name: Validate Gradle wrapper and project files
+        run: |
+          test -f android/build.gradle.kts
+          test -f android/settings.gradle.kts
+          test -f android/app/build.gradle.kts
+          test -f protocol/fixtures/vectors.json

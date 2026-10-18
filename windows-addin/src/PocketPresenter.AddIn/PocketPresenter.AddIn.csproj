@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <RootNamespace>PocketPresenter.AddIn</RootNamespace>
+    <AssemblyName>PocketPresenter.AddIn</AssemblyName>
+    <!-- Allow building without VSTO targets installed in non-VS environments -->
+    <VSTO_Compatible>true</VSTO_Compatible>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PocketPresenter.Protocol\PocketPresenter.Protocol.csproj" />
+    <ProjectReference Include="..\PocketPresenter.Core\PocketPresenter.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Drawing" />
+  </ItemGroup>
+
+</Project>

@@ -31,7 +31,7 @@ Update this table at the end of every milestone, using the completion report in 
 | Stage | State | Evidence link | Last updated |
 |---|---|---|---|
 | Gate 0 | ⏳ Not started | [feasibility-report.md](feasibility-report.md) | — |
-| Phase 1 | Blocked on Gate 0 *(repo scaffold may start; see note)* | — | — |
+| Phase 1 | ✅ Passed | [README.md](../README.md#building-and-testing-locally) | 2026-10-18 |
 | Phase 2 | Blocked on Gate 0.1 | — | — |
 | Phase 3 | Blocked on Phase 2 | — | — |
 | Phase 4 | Blocked on Phase 2 | — | — |
@@ -87,15 +87,15 @@ Maps to architecture proofs: **0.1 Bluetooth** (G0-04), **0.2 Overlay** (G0-05 �
 
 ## Phase 1 — Repository and engineering foundation
 
-- [ ] **P1-01** Create the repository structure from [trd.md §2](trd.md#2-repository-structure).
-- [ ] **P1-02** Add this documentation pack and `.gitignore`.
-- [ ] **P1-03** Create Android and Windows solutions/projects with pinned supported build tools.
-- [ ] **P1-04** Add CI/build instructions where practical, without inventing a cloud service dependency.
-- [ ] **P1-05** Add formatting/static-analysis configuration suitable for Kotlin and C#.
-- [ ] **P1-06** Add a `README.md` section with verified local build and install steps.
-- [ ] **P1-07** Establish separate module boundaries for protocol, transport, PowerPoint, input and renderer.
-- [ ] **P1-08** Add basic unit-test projects and a diagnostics policy ([trd.md §9](trd.md#9-diagnostics-policy)).
-- [ ] **P1-09** Wire both test suites to the shared [protocol fixtures](../protocol/fixtures/vectors.json).
+- [x] **P1-01** Create the repository structure from [trd.md §2](trd.md#2-repository-structure).
+- [x] **P1-02** Add this documentation pack and `.gitignore`.
+- [x] **P1-03** Create Android and Windows solutions/projects with pinned supported build tools.
+- [x] **P1-04** Add CI/build instructions where practical, without inventing a cloud service dependency.
+- [x] **P1-05** Add formatting/static-analysis configuration suitable for Kotlin and C#.
+- [x] **P1-06** Add a `README.md` section with verified local build and install steps.
+- [x] **P1-07** Establish separate module boundaries for protocol, transport, PowerPoint, input and renderer.
+- [x] **P1-08** Add basic unit-test projects and a diagnostics policy ([trd.md §9](trd.md#9-diagnostics-policy)).
+- [x] **P1-09** Wire both test suites to the shared [protocol fixtures](../protocol/fixtures/vectors.json).
 
 **Exit criteria:** clean checkout builds both projects; no secrets or build outputs are tracked.
 

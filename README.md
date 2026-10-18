@@ -102,6 +102,27 @@ Start with [docs/README.md](docs/README.md) for the reading order and canonical 
 - [Implementation plan](docs/implementation_plan.md) — phases, task IDs, definition of done
 - [Feasibility report](docs/feasibility-report.md) — Gate 0 results template
 
+## Building and Testing Locally
+
+### Windows Solution & Protocol Tests
+Prerequisites: .NET 9.0 SDK and/or Visual Studio 2022 with .NET Framework 4.8 Developer Pack.
+
+```powershell
+# Build entire Windows solution (.NET Framework 4.8 AddIn + Core + Protocol libraries)
+dotnet build windows-addin/PocketPresenter.sln
+
+# Run all unit tests and validate shared wire protocol vectors (V01–V10)
+dotnet test windows-addin/tests/PocketPresenter.Tests/PocketPresenter.Tests.csproj
+```
+
+### Android Controller
+Prerequisites: Android Studio, OpenJDK 17, Android SDK 34 (API 31–34).
+
+```bash
+cd android
+./gradlew testDebugUnitTest
+```
+
 ## Getting started (contributors)
 
 1. Read [docs/README.md](docs/README.md), then [docs/rules.md](docs/rules.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
