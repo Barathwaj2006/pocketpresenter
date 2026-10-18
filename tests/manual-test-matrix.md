@@ -86,3 +86,42 @@ Fill from the sections above. Publish this table in the README when a release is
 2. Confirm add-in unloads without crash dialog or COM orphan process hanging in Task Manager.
 3. Confirm all event delegates are cleanly detached and transport closes gracefully.
 
+## 5. Phase 4 — Pointer Control, Gestures & Latency Verification (P4-07, AT-02, AT-04)
+
+### Test 4.1: Pointer Coordinate Mapping and Sensitivity
+1. Move finger across trackpad surface at varied speeds.
+2. Verify smooth proportional cursor translation across single and multiple monitor setups.
+3. Test edge clamping: push finger continuously past right/bottom edges.
+4. Verify cursor stops at virtual desktop bounds (`Right - 1`, `Bottom - 1`) and does not disappear off-screen.
+
+### Test 4.2: Gesture State Machine Verification
+1. **Single Tap:** Tap lightly once (< 250ms); verify Windows executes left click at cursor position.
+2. **Two-Finger Tap:** Tap two fingers simultaneously; verify Windows executes right click (context menu opens).
+3. **Two-Finger Scroll:** Drag two fingers vertically; verify document/slide scrolls. Invert `reverseScroll` setting and confirm scroll direction reverses naturally.
+4. **Long-Press Drag:** Hold single finger stationary for > 400ms then move across surface.
+   - Verify Windows executes left mouse button down followed by mouse drag.
+   - Lift finger: verify left mouse button is released immediately.
+
+### Test 4.3: Injected Disconnect Mid-Drag Safety (AT-04)
+1. Initiate a long-press left-click drag on Windows desktop selecting multiple icons.
+2. While moving with the mouse button held, disconnect Bluetooth (turn off phone Bluetooth or disconnect cable).
+3. Verify within ≤ 1,000 ms that PocketPresenter triggers `ReleaseAll()`.
+4. Verify the mouse button is NOT left stuck down; normal physical mouse clicking functions immediately.
+
+### Test 4.4: ADR-0013 Held-Button Watchdog
+1. Emulate or trigger a held left button without sending updates.
+2. Wait 3,000 ms of radio silence.
+3. Verify add-in watchdog triggers automatic `ReleaseAll()`, releasing the held button.
+
+### Test 4.5: Touch-to-Cursor Latency Measurement Method (TRD §8)
+- **Method:**
+  1. Phone records a monotonic timestamp $T_{phone}$ upon dispatching `pointer.delta`.
+  2. Add-in records local timestamp $T_{win}$ upon executing `SetCursorPos`.
+  3. Estimate one-way clock difference using periodic `session.ping` / `session.pong` round-trip time: $\Delta = T_{win\_pong} - T_{phone\_ping} - \frac{RTT}{2}$.
+  4. One-way latency sample: $L_i = T_{win} - T_{phone} - \Delta$.
+  5. Collect 500 samples across steady movement.
+- **Criteria:**
+  - Median latency target: $< 50\text{ ms}$.
+  - p95 latency target: $< 100\text{ ms}$.
+
+

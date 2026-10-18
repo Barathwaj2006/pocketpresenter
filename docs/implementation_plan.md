@@ -126,13 +126,13 @@ Maps to architecture proofs: **0.1 Bluetooth** (G0-04), **0.2 Overlay** (G0-05 �
 
 ## Phase 4 — Pointer controller and input safety
 
-- [ ] **P4-01** Implement pointer coordinate mapping and sensitivity settings.
-- [ ] **P4-02** Implement left/right click, scroll and button down/up tracking.
-- [ ] **P4-03** Implement phone gesture state machine and cancellation behavior.
-- [ ] **P4-04** Add timeout handling that releases every held button.
-- [ ] **P4-05** Handle monitor bounds, virtual desktop coordinates, DPI scaling and target monitor changes.
-- [ ] **P4-06** Test pointer accuracy, edge behavior and disconnects during a drag.
-- [ ] **P4-07** Measure touch-to-cursor latency (median and p95) and record the method ([trd.md §8](trd.md#8-latency-budget)).
+- [x] **P4-01** Implement pointer coordinate mapping and sensitivity settings.
+- [x] **P4-02** Implement left/right click, scroll and button down/up tracking.
+- [x] **P4-03** Implement phone gesture state machine and cancellation behavior.
+- [x] **P4-04** Add timeout handling that releases every held button.
+- [x] **P4-05** Handle monitor bounds, virtual desktop coordinates, DPI scaling and target monitor changes.
+- [x] **P4-06** Test pointer accuracy, edge behavior and disconnects during a drag.
+- [x] **P4-07** Measure touch-to-cursor latency (median and p95) and record the method ([trd.md §8](trd.md#8-latency-budget)).
 
 **Exit criteria:** cursor control remains predictable, and no disconnect path leaves a mouse button held (AT-02, AT-04).
 

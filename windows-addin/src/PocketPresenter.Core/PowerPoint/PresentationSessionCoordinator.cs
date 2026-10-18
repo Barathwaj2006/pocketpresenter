@@ -1,12 +1,13 @@
 using System;
 using System.Text.Json;
+using PocketPresenter.Core.Input;
 using PocketPresenter.Protocol;
 
 namespace PocketPresenter.Core.PowerPoint
 {
     /// <summary>
     /// Coordinates PowerPoint presentation control, session state machine,
-    /// ribbon UI state, and outbound protocol messaging.
+    /// ribbon UI state, pointer input controller, and outbound protocol messaging.
     /// Strictly adheres to STA thread rules and unsubscribes all events on unload.
     /// </summary>
     public class PresentationSessionCoordinator : IDisposable, ICommandHandler
@@ -15,6 +16,7 @@ namespace PocketPresenter.Core.PowerPoint
         public SessionStateMachine SessionStateMachine { get; }
         public CommandRouter CommandRouter { get; }
         public RibbonController RibbonController { get; }
+        public PointerController InputController { get; }
 
         public event Action<Envelope>? OutboundMessageReady;
 
@@ -34,12 +36,14 @@ namespace PocketPresenter.Core.PowerPoint
         public PresentationSessionCoordinator(
             PowerPointInteropController? powerPointController = null,
             SessionStateMachine? sessionStateMachine = null,
-            RibbonController? ribbonController = null)
+            RibbonController? ribbonController = null,
+            PointerController? inputController = null)
         {
             PowerPointController = powerPointController ?? new PowerPointInteropController();
             SessionStateMachine = sessionStateMachine ?? new SessionStateMachine();
             CommandRouter = new CommandRouter(this);
             RibbonController = ribbonController ?? new RibbonController();
+            InputController = inputController ?? new PointerController();
 
             _onConnectRequested = () => SessionStateMachine.StartConnecting();
             _onDisconnectRequested = () => SessionStateMachine.Disconnect();
@@ -104,7 +108,8 @@ namespace PocketPresenter.Core.PowerPoint
 
         private void OnSessionDisconnectCleanup()
         {
-            // Mandatory input safety cleanup
+            // Mandatory input safety cleanup: release all held buttons
+            InputController.ReleaseAll();
         }
 
         public void BroadcastStateUpdate()
@@ -152,13 +157,40 @@ namespace PocketPresenter.Core.PowerPoint
                 : CommandExecutionResult.Fail(result.ErrorCode ?? ErrorCodes.Internal, result.Message ?? "Previous failed");
         }
 
-        public void HandlePointerDelta(int dx, int dy) { }
-        public void HandlePointerButton(string button, string action) { }
-        public void HandlePointerScroll(int dy) { }
+        public void HandlePointerDelta(int dx, int dy)
+        {
+            InputController.MoveBy(dx, dy);
+        }
+
+        public void HandlePointerButton(string button, string action)
+        {
+            var btn = button.ToLowerInvariant() switch
+            {
+                "right" => MouseButton.Right,
+                "middle" => MouseButton.Middle,
+                _ => MouseButton.Left
+            };
+
+            if (action.Equals("down", StringComparison.OrdinalIgnoreCase))
+            {
+                InputController.ButtonDown(btn);
+            }
+            else
+            {
+                InputController.ButtonUp(btn);
+            }
+        }
+
+        public void HandlePointerScroll(int dy)
+        {
+            InputController.Scroll(dy);
+        }
+
         public void HandleEffectSet(string effect, double intensity, double scale, bool reducedMotion)
         {
             RibbonController.OnEffectSelected(effect);
         }
+
         public void HandleDrawStart(double x, double y, string color, int width) { }
         public void HandleDrawPoint(JsonElement points) { }
         public void HandleDrawEnd() { }
@@ -187,6 +219,9 @@ namespace PocketPresenter.Core.PowerPoint
 
             SessionStateMachine.Disconnect();
             PowerPointController.Dispose();
+
+            InputController.ReleaseAll();
+            InputController.Dispose();
         }
     }
 }
