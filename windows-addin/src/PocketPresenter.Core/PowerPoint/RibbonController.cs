@@ -38,9 +38,21 @@ namespace PocketPresenter.Core.PowerPoint
 
         public void OnEffectSelected(string effectId)
         {
-            ActiveEffect = effectId;
-            EffectChangeRequested?.Invoke(effectId);
-            RibbonInvalidateRequested?.Invoke();
+            if (ActiveEffect != effectId)
+            {
+                ActiveEffect = effectId;
+                EffectChangeRequested?.Invoke(effectId);
+                RibbonInvalidateRequested?.Invoke();
+            }
+        }
+
+        public void SetActiveEffect(string effectId)
+        {
+            if (ActiveEffect != effectId)
+            {
+                ActiveEffect = effectId;
+                RibbonInvalidateRequested?.Invoke();
+            }
         }
 
         public void UpdateStatus(RibbonConnectionStatus newStatus)

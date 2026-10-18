@@ -1,5 +1,6 @@
 using System;
 using System.Text.Json;
+using PocketPresenter.Core.Effects;
 using PocketPresenter.Core.Input;
 using PocketPresenter.Core.Overlay;
 using PocketPresenter.Protocol;
@@ -34,6 +35,7 @@ namespace PocketPresenter.Core.PowerPoint
         private readonly Action _onSlideShowStarted;
         private readonly Action _onSlideShowEnded;
         private readonly Action<int, int> _onSlideChanged;
+        private readonly Action<string> _onRibbonEffectChanged;
 
         public PresentationSessionCoordinator(
             PowerPointInteropController? powerPointController = null,
@@ -74,9 +76,12 @@ namespace PocketPresenter.Core.PowerPoint
                 BroadcastStateUpdate();
             };
 
+            _onRibbonEffectChanged = eff => HandleEffectSet(eff, OverlayController.Intensity, OverlayController.Scale, OverlayController.ReducedMotion);
+
             // Wire Ribbon actions
             RibbonController.ConnectRequested += _onConnectRequested;
             RibbonController.DisconnectRequested += _onDisconnectRequested;
+            RibbonController.EffectChangeRequested += _onRibbonEffectChanged;
 
             // Wire Session state
             SessionStateMachine.StateChanged += _onSessionStateChanged;
@@ -207,10 +212,13 @@ namespace PocketPresenter.Core.PowerPoint
 
         public void HandleEffectSet(string effect, double intensity, double scale, bool reducedMotion)
         {
-            RibbonController.OnEffectSelected(effect);
+            RibbonController.SetActiveEffect(effect);
             OverlayController.Intensity = intensity;
             OverlayController.Scale = scale;
             OverlayController.ReducedMotion = reducedMotion;
+
+            var newEffect = EffectFactory.Create(effect);
+            OverlayController.SetEffect(newEffect);
 
             if (effect.Equals("off", StringComparison.OrdinalIgnoreCase))
             {
@@ -238,6 +246,7 @@ namespace PocketPresenter.Core.PowerPoint
             // Unsubscribe all events (P3-06)
             RibbonController.ConnectRequested -= _onConnectRequested;
             RibbonController.DisconnectRequested -= _onDisconnectRequested;
+            RibbonController.EffectChangeRequested -= _onRibbonEffectChanged;
 
             SessionStateMachine.StateChanged -= _onSessionStateChanged;
             SessionStateMachine.DisconnectCleanupRequired -= _onSessionDisconnectCleanup;

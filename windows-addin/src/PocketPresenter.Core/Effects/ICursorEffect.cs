@@ -37,6 +37,7 @@ namespace PocketPresenter.Core.Effects
         void Clear();
         void DrawPolygon(ReadOnlySpan<(float X, float Y)> points, uint colorRgba);
         void DrawCircle(float centerX, float centerY, float radius, uint colorRgba);
+        void DrawLine(float x1, float y1, float x2, float y2, uint colorRgba);
     }
 
     /// <summary>

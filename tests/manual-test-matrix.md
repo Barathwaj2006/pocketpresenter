@@ -147,5 +147,36 @@ Fill from the sections above. Publish this table in the README when a release is
 3. Re-enter slide show (F5): verify overlay reappears automatically.
 4. With slide show running, disconnect Bluetooth or close PowerPoint; verify overlay is destroyed cleanly with zero orphan processes.
 
+## 7. Phase 6 — Three Cursor Effects & Live Switching Verification (P6-07, P6-08, AT-03)
+
+### Test 6.1: Dual-Tone Edge Readability Across Slide Backgrounds (P6-07)
+1. Prepare slides with:
+   - Pure white `#FFFFFF` background.
+   - Deep black `#000000` background.
+   - Saturated background (bright blue, yellow, high-contrast imagery).
+2. Move cursor across each slide with **Honeycomb Pulse**, **Diamond Facets**, and **Geometric Ripple**.
+3. Verify that the dual-tone edge (dark under-stroke with bright cyan/teal highlight) ensures clear, sharp visibility against all backgrounds without obscuring small text.
+
+### Test 6.2: Restrained Footprint & Anchor Consistency
+1. Verify that all three effects remain strictly within the compact radius (~60–100 px).
+2. Confirm the true cursor center dot is always anchored directly at the native Windows cursor location.
+3. Verify that switching between effects does not introduce any anchor shift, cursor jump, or jitter.
+
+### Test 6.3: Live Switching Without Presentation Interruption (P6-08, AT-03)
+1. While continuously moving the cursor and presenting, switch live between:
+   `Honeycomb Pulse` ↔ `Diamond Facets` ↔ `Geometric Ripple` ↔ `Off`.
+2. Confirm each effect activates instantly upon selection.
+3. Verify that live switching:
+   - Does NOT change or steal window focus.
+   - Does NOT delay or drop simultaneous `slide.next` or `slide.previous` commands.
+   - Does NOT alter the cursor screen coordinates.
+   - Setting `Off` immediately disables overlay rendering and leaves native Windows cursor completely unaltered.
+
+### Test 6.4: Idle Settling & Zero Redraw Verification (P6-06)
+1. Move the cursor and then stop.
+2. Verify that the effect settles and stops scheduling redraw frames within ≤ 300 ms (Honeycomb/Diamond) and ≤ 400 ms (Ripple).
+3. Confirm GPU/CPU utilization drops to baseline 0% while stationary.
+
+
 
 

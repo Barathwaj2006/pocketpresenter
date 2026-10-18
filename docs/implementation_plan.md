@@ -149,14 +149,14 @@ Maps to architecture proofs: **0.1 Bluetooth** (G0-04), **0.2 Overlay** (G0-05 �
 
 ## Phase 6 — Three effects and live switching
 
-- [ ] **P6-01** Define common `ICursorEffect` renderer interface ([trd.md §5](trd.md#5-key-interfaces-illustrative)).
-- [ ] **P6-02** Implement Honeycomb Pulse with restrained local depth and one click ripple.
-- [ ] **P6-03** Implement Diamond Facets using the same cursor anchor/footprint rules.
-- [ ] **P6-04** Implement Geometric Ripple with two or three contours.
-- [ ] **P6-05** Add live `effect.set`, `off`, intensity and reduced-motion options.
-- [ ] **P6-06** Cache geometry/resources and limit redraw to the local effect region; stop scheduling frames when idle.
-- [ ] **P6-07** Test light, dark and saturated slides and long-duration presentations; evaluate the dual-tone edge ([ui_ux_brief.md §6](ui_ux_brief.md#6-the-three-windows-cursor-effects)).
-- [ ] **P6-08** Verify switching effects never alters cursor position or delays commands (AT-03).
+- [x] **P6-01** Define common `ICursorEffect` renderer interface ([trd.md §5](trd.md#5-key-interfaces-illustrative)).
+- [x] **P6-02** Implement Honeycomb Pulse with restrained local depth and one click ripple.
+- [x] **P6-03** Implement Diamond Facets using the same cursor anchor/footprint rules.
+- [x] **P6-04** Implement Geometric Ripple with two or three contours.
+- [x] **P6-05** Add live `effect.set`, `off`, intensity and reduced-motion options.
+- [x] **P6-06** Cache geometry/resources and limit redraw to the local effect region; stop scheduling frames when idle.
+- [x] **P6-07** Test light, dark and saturated slides and long-duration presentations; evaluate the dual-tone edge ([ui_ux_brief.md §6](ui_ux_brief.md#6-the-three-windows-cursor-effects)).
+- [x] **P6-08** Verify switching effects never alters cursor position or delays commands (AT-03).
 
 **Exit criteria:** all three effects can be switched repeatedly during a slideshow with no focus change, cursor jump or presentation interruption.
 

@@ -78,13 +78,53 @@ namespace PocketPresenter.Core.Effects
 
         public void DrawPolygon(ReadOnlySpan<(float X, float Y)> points, uint colorRgba)
         {
-            // Optional polygon rasterization used by honeycomb/diamond in Phase 6
-            if (points.Length < 3) return;
+            if (points.Length < 2) return;
 
             for (int i = 0; i < points.Length; i++)
             {
-                var pt = points[i];
-                DrawCircle(pt.X, pt.Y, 2.0f, colorRgba);
+                var p1 = points[i];
+                var p2 = points[(i + 1) % points.Length];
+                DrawLine(p1.X, p1.Y, p2.X, p2.Y, colorRgba);
+            }
+        }
+
+        public void DrawLine(float x1, float y1, float x2, float y2, uint colorRgba)
+        {
+            byte r = (byte)((colorRgba >> 24) & 0xFF);
+            byte g = (byte)((colorRgba >> 16) & 0xFF);
+            byte b = (byte)((colorRgba >> 8) & 0xFF);
+            byte a = (byte)(colorRgba & 0xFF);
+
+            if (a == 0) return;
+
+            uint premulBgra = ((uint)a << 24) |
+                              ((uint)((r * a) / 255) << 16) |
+                              ((uint)((g * a) / 255) << 8) |
+                              (uint)((b * a) / 255);
+
+            float dx = x2 - x1;
+            float dy = y2 - y1;
+            float dist = (float)Math.Sqrt((dx * dx) + (dy * dy));
+            int steps = Math.Max(1, (int)Math.Ceiling(dist));
+
+            float xInc = dx / steps;
+            float yInc = dy / steps;
+
+            float cx = x1;
+            float cy = y1;
+
+            for (int i = 0; i <= steps; i++)
+            {
+                int px = (int)Math.Round(cx);
+                int py = (int)Math.Round(cy);
+
+                if (px >= 0 && px < Width && py >= 0 && py < Height)
+                {
+                    Pixels[(py * Width) + px] = premulBgra;
+                }
+
+                cx += xInc;
+                cy += yInc;
             }
         }
     }
