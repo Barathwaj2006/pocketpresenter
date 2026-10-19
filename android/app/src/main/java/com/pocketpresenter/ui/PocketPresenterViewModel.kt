@@ -91,6 +91,16 @@ class PocketPresenterViewModel(
     val connectedDeviceName: StateFlow<String?> = _connectedDeviceName.asStateFlow()
 
     init {
+        PresentationForegroundService.onVolumeButtonAction = { direction ->
+            if (sessionState.value is SessionState.PresentingArmed) {
+                if (direction > 0) {
+                    presentationController.nextSlide()
+                } else if (direction < 0) {
+                    presentationController.previousSlide()
+                }
+            }
+        }
+
         // Observe session state changes to update gesture processor, settings, and foreground notifications
         scope.launch {
             sessionState.collect { state ->

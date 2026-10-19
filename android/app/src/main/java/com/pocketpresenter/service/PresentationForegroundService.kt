@@ -29,6 +29,8 @@ class PresentationForegroundService : Service() {
         const val ACTION_UPDATE_STATUS = "com.pocketpresenter.action.UPDATE_STATUS"
         const val EXTRA_STATUS = "extra_status"
 
+        var onVolumeButtonAction: ((direction: Int) -> Unit)? = null
+
         fun start(context: Context, status: String = "Waiting for PowerPoint") {
             val intent = Intent(context, PresentationForegroundService::class.java).apply {
                 action = ACTION_START
@@ -58,6 +60,7 @@ class PresentationForegroundService : Service() {
     }
 
     private var currentStatus: String = "Waiting for PowerPoint"
+    private var mediaSession: android.media.session.MediaSession? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -67,6 +70,7 @@ class PresentationForegroundService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
             ACTION_STOP -> {
+                releaseMediaSession()
                 stopForeground(STOP_FOREGROUND_REMOVE)
                 stopSelf()
                 return START_NOT_STICKY
@@ -83,6 +87,7 @@ class PresentationForegroundService : Service() {
 
             ACTION_START, null -> {
                 intent?.getStringExtra(EXTRA_STATUS)?.let { currentStatus = it }
+                setupMediaSession()
                 val notification = buildNotification(currentStatus)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     startForeground(
@@ -96,6 +101,40 @@ class PresentationForegroundService : Service() {
             }
         }
         return START_STICKY
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        releaseMediaSession()
+    }
+
+    private fun setupMediaSession() {
+        if (mediaSession != null) return
+        try {
+            val session = android.media.session.MediaSession(this, "PocketPresenterVolume")
+            val volumeProvider = object : android.media.VolumeProvider(VOLUME_CONTROL_RELATIVE, 100, 50) {
+                override fun onAdjustVolume(direction: Int) {
+                    if (direction != 0) {
+                        onVolumeButtonAction?.invoke(direction)
+                    }
+                }
+            }
+            session.setPlaybackToRemote(volumeProvider)
+            session.isActive = true
+            mediaSession = session
+        } catch (_: Exception) {
+            // Fail safe if media session cannot be allocated
+        }
+    }
+
+    private fun releaseMediaSession() {
+        try {
+            mediaSession?.isActive = false
+            mediaSession?.release()
+        } catch (_: Exception) {
+        } finally {
+            mediaSession = null
+        }
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
