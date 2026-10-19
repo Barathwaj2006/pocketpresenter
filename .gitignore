@@ -44,7 +44,7 @@ TestResults/
 secrets.*
 
 # Local diagnostics and captures
-diagnostics/
+/diagnostics/
 *.etl
 
 # Accidental Node / Expo / Web caches
