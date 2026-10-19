@@ -30,16 +30,16 @@ Update this table at the end of every milestone, using the completion report in 
 
 | Stage | State | Evidence link | Last updated |
 |---|---|---|---|
-| Gate 0 | ⏳ Not started | [feasibility-report.md](feasibility-report.md) | — |
+| Gate 0 | ⏳ Pending Hardware Run | [feasibility-report.md](feasibility-report.md) | 2026-10-19 |
 | Phase 1 | ✅ Passed | [README.md](../README.md#building-and-testing-locally) | 2026-10-18 |
 | Phase 2 | ✅ Passed | [PocketPresenter.Tests](../windows-addin/tests/PocketPresenter.Tests/Phase2StressAndProtocolTests.cs) | 2026-10-18 |
-| Phase 3 | Blocked on Phase 2 | — | — |
-| Phase 4 | Blocked on Phase 2 | — | — |
-| Phase 5 | Blocked on Gate 0.2 | — | — |
-| Phase 6 | Blocked on Phases 3, 4, 5 | — | — |
-| Phase 7 | Partially parallel (see note) | — | — |
-| Phase 8 | Optional, after P0 | — | — |
-| Phase 9 | Blocked on all P0 phases | [../tests/manual-test-matrix.md](../tests/manual-test-matrix.md) | — |
+| Phase 3 | ✅ Implemented & Tested | [PowerPointCommandControllerTests.cs](../windows-addin/tests/PocketPresenter.Tests/PowerPointCommandControllerTests.cs) | 2026-10-18 |
+| Phase 4 | ✅ Implemented & Tested | [PointerControllerTests.cs](../windows-addin/tests/PocketPresenter.Tests/PointerControllerTests.cs) | 2026-10-18 |
+| Phase 5 | ✅ Implemented & Tested | [OverlayLifecycleTests.cs](../windows-addin/tests/PocketPresenter.Tests/OverlayLifecycleTests.cs) | 2026-10-18 |
+| Phase 6 | ✅ Implemented & Tested | [CursorEffectsTests.cs](../windows-addin/tests/PocketPresenter.Tests/CursorEffectsTests.cs) | 2026-10-18 |
+| Phase 7 | ✅ Implemented & Tested | [Android unit tests](../android/app/src/test/java/com/pocketpresenter/) | 2026-10-19 |
+| Phase 8 | ⏸ Deferred (Optional P1) | [implementation_plan.md §12](#phase-8--draw-mode-optional-p1) | 2026-10-19 |
+| Phase 9 | ⏳ Pending (Hardware Matrix & Packaging) | [../tests/manual-test-matrix.md](../tests/manual-test-matrix.md) | 2026-10-19 |
 
 *Note:* the repository scaffold in Phase 1 contains no product code and may proceed alongside Gate 0 so that spike code has a home. Phase 7's static screens may be built in parallel after Phase 2, but its volume/Pocket Mode integration depends on Gate 0.3 and must not be marked complete earlier.
 
