@@ -8,19 +8,19 @@ Per-device and ongoing results are tracked in [../tests/manual-test-matrix.md](.
 
 | Item | Value |
 |---|---|
-| Date(s) tested | |
-| Tester | |
-| Laptop model / CPU | |
-| Windows version and build | |
-| Bluetooth adapter and driver version | |
-| PowerPoint version / build / channel | |
-| PowerPoint bitness (32/64) | |
-| Phone model | |
-| Android version / OEM skin | |
-| Phone battery-optimization settings for the app | |
-| External display / projector used | |
-| Display scaling (%) | |
-| Presentation file used (size, media, transitions) | |
+| Date(s) tested | 2026-10-19 |
+| Tester | Barathwaj |
+| Laptop model / CPU | Windows 11 PC (x64) |
+| Windows version and build | Windows 11 Home Single Language (Build 26200, 64-bit) |
+| Bluetooth adapter and driver version | Realtek Wireless Bluetooth Adapter |
+| PowerPoint version / build / channel | Microsoft PowerPoint 365 / Office 16 (16.0.20430.20146) |
+| PowerPoint bitness (32/64) | 64-bit |
+| Phone model | OPPO F31 Pro 5G (Paired name: JIO_OPPO F31 Pro 5G) |
+| Android version / OEM skin | Android 14 / ColorOS |
+| Phone battery-optimization settings for the app | Unrestricted / Don't optimize |
+| External display / projector used | Laptop internal display / HDMI output |
+| Display scaling (%) | 100% / 125% / 150% |
+| Presentation file used (size, media, transitions) | Test presentation (.pptx) |
 
 ## 2. Summary
 
