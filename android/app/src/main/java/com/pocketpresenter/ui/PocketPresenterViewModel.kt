@@ -47,6 +47,12 @@ class PocketPresenterViewModel(
 
     // Outbound envelope dispatcher (hook for transport or mock)
     var onSendEnvelope: ((Envelope) -> Unit)? = null
+    var onStartTransport: (() -> Unit)? = null
+    var onStopTransport: (() -> Unit)? = null
+
+    fun setConnectedDeviceName(name: String?) {
+        _connectedDeviceName.value = name
+    }
 
     val sessionManager: AndroidSessionManagerImpl = AndroidSessionManagerImpl(
         onSendEnvelope = { env -> onSendEnvelope?.invoke(env) },
@@ -138,6 +144,7 @@ class PocketPresenterViewModel(
         context?.let {
             PresentationForegroundService.start(it, "Waiting for PowerPoint")
         }
+        onStartTransport?.invoke()
     }
 
     fun stopSession(context: Context? = null) {
@@ -145,6 +152,7 @@ class PocketPresenterViewModel(
         context?.let {
             PresentationForegroundService.stop(it)
         }
+        onStopTransport?.invoke()
     }
 
     /**

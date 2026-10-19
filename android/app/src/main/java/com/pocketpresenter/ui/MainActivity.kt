@@ -28,7 +28,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
+import com.pocketpresenter.bluetooth.AndroidRfcommTransportImpl
+import com.pocketpresenter.bluetooth.TransportEvent
 import com.pocketpresenter.input.AndroidMouseButton
+import com.pocketpresenter.protocol.AndroidFrameDecoder
+import com.pocketpresenter.protocol.AndroidFrameEncoder
 import com.pocketpresenter.ui.components.ErrorBanner
 import com.pocketpresenter.ui.components.PocketModeDialog
 import com.pocketpresenter.ui.screens.ControllerScreen
@@ -37,6 +42,8 @@ import com.pocketpresenter.ui.screens.SettingsScreen
 import com.pocketpresenter.ui.screens.SetupScreen
 import com.pocketpresenter.ui.theme.GraphiteBackground
 import com.pocketpresenter.ui.theme.PocketPresenterTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /**
  * PocketPresenter Main Activity.
@@ -51,6 +58,9 @@ class MainActivity : ComponentActivity() {
     private var isBluetoothEnabled by mutableStateOf(true)
     private var showPocketModeDialog by mutableStateOf(false)
 
+    private var rfcommTransport: AndroidRfcommTransportImpl? = null
+    private val frameDecoder = AndroidFrameDecoder()
+
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
@@ -63,6 +73,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         checkPermissionsAndBluetooth()
+        setupTransport()
 
         setContent {
             PocketPresenterTheme {
@@ -78,6 +89,58 @@ class MainActivity : ComponentActivity() {
                 )
             }
         }
+    }
+
+    private fun setupTransport() {
+        val adapter = BluetoothAdapter.getDefaultAdapter()
+        val transport = AndroidRfcommTransportImpl(adapter)
+        rfcommTransport = transport
+
+        viewModel.onStartTransport = {
+            lifecycleScope.launch(Dispatchers.IO) {
+                transport.start()
+            }
+        }
+
+        viewModel.onStopTransport = {
+            transport.close()
+        }
+
+        viewModel.onSendEnvelope = { envelope ->
+            lifecycleScope.launch(Dispatchers.IO) {
+                try {
+                    val frame = AndroidFrameEncoder.encode(envelope)
+                    transport.send(frame.toByteArray(Charsets.UTF_8))
+                } catch (_: Exception) {}
+            }
+        }
+
+        lifecycleScope.launch {
+            transport.events.collect { event ->
+                when (event) {
+                    is TransportEvent.Connected -> {
+                        viewModel.setConnectedDeviceName(event.peerAddress)
+                    }
+                    is TransportEvent.FrameReceived -> {
+                        val text = String(event.data, Charsets.UTF_8)
+                        val results = frameDecoder.feed(text)
+                        for (res in results) {
+                            if (res.success && res.envelope != null) {
+                                viewModel.sessionManager.handleInboundEnvelope(res.envelope)
+                            }
+                        }
+                    }
+                    is TransportEvent.Closed -> {
+                        viewModel.sessionManager.disconnect()
+                    }
+                }
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        rfcommTransport?.close()
     }
 
     override fun onResume() {
@@ -171,6 +234,7 @@ fun PocketPresenterMainApp(
     val currentError by viewModel.currentError.collectAsState()
     val isDragLocked by viewModel.isDragLocked.collectAsState()
     val connectedDeviceName by viewModel.connectedDeviceName.collectAsState()
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     Scaffold(
         containerColor = GraphiteBackground
@@ -197,8 +261,8 @@ fun PocketPresenterMainApp(
                         selectedEffectId = userSettings.selectedEffect,
                         effectIntensity = userSettings.effectIntensity,
                         reducedMotion = userSettings.reducedMotion,
-                        onStartSession = { viewModel.startSession() },
-                        onStopSession = { viewModel.stopSession() },
+                        onStartSession = { viewModel.startSession(context) },
+                        onStopSession = { viewModel.stopSession(context) },
                         onNavigateToController = { viewModel.navigateTo(AppScreen.CONTROLLER) },
                         onNavigateToSettings = { viewModel.navigateTo(AppScreen.SETTINGS) },
                         onNavigateToSetup = { viewModel.navigateTo(AppScreen.SETUP) },
