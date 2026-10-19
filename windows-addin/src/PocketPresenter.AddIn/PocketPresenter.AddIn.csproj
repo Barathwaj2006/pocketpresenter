@@ -8,6 +8,8 @@
     <AssemblyName>PocketPresenter.AddIn</AssemblyName>
     <!-- Allow building without VSTO targets installed in non-VS environments -->
     <VSTO_Compatible>true</VSTO_Compatible>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,8 +18,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Drawing" />
+    <Reference Include="Extensibility">
+      <HintPath>..\..\lib\extensibility.dll</HintPath>
+      <EmbedInteropTypes>true</EmbedInteropTypes>
+    </Reference>
   </ItemGroup>
 
 </Project>
